@@ -88,7 +88,12 @@
           {{ uidManipulate.gameUsername || "???" }}
         </p>
       </div>
-    </div>
+    </div> 
+     <el-radio-group v-if="editUid" v-model="uidManipulate.isMain"  @change="handleIsMainSelection" class="isMain-Radio">
+      <el-radio label="1" size="large"  >主賬號</el-radio>
+      <el-radio label="0" size="large" >小號</el-radio>
+    </el-radio-group>
+    <p>{{ values }}</p>
     <div class="confirmation-button-container" v-if="editUid == true">
       <el-button
         type="danger"
@@ -101,7 +106,6 @@
       <el-button type="primary" plain size="large">确定</el-button>
     </div>
 
-    <div class="username-container"></div>
   </el-card>
 </template>
 <script setup lang="ts">
@@ -110,7 +114,7 @@ import { ref, reactive, computed, defineProps, onMounted } from "vue"
 import { useGameUidStorageStore } from "./../../stores/uidStorage.ts"
 import { useUidManipulateStore } from "./../../stores/uidManipulate.ts"
 import Clipboard from "clipboard"
-
+import { useForm } from 'vee-validate';
 const gameUidStorage = useGameUidStorageStore()
 const uidManipulate = useUidManipulateStore()
 const userGameInfo = ref()
@@ -118,6 +122,7 @@ const gameInfo = ref()
 const serverInfo = ref()
 const showUid = ref(true)
 const editUid = ref(false)
+const { values, defineField } = useForm();
 
 const copy = () => {
   const clipboard = new Clipboard(".text")
@@ -164,6 +169,9 @@ const handleSelectServer = (server) => {
     //   : null
     uidManipulate.gameUid = selectedServer["game_uid"]
     uidManipulate.gameUsername = selectedServer["game_username"]
+    uidManipulate.isMain = selectedServer["isMain"]
+    console.log(`CHECK USER 888 ${selectedServer["isMain"]}`)
+    console.log(`CHECK USER 888 ${selectedServer["game_uid"]}`)
     console.log(`CHECK USER 888 ${selectedServer["game_uid"]}`)
     console.log(`CHECK USER 888 ${selectedServer["game_username"]}`)
     console.log("HERE uidManipulate.gameUid:", uidManipulate.gameUid)
@@ -185,6 +193,11 @@ const handleUidEdit = () => {
   console.log("handleUidEdit")
   showUid.value = false
   editUid.value = true
+}
+
+const handleIsMainSelection = () => {
+    console.log(`handleIsMainRadio ${uidManipulate.isMain}`);
+
 }
 
 const handleUidManipulateCancel = async () => {
@@ -330,4 +343,7 @@ onMounted(startingFunc)
   margin-top: 10px;
   z-index: 9999;
 }
+
+
+
 </style>
