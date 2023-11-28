@@ -2,6 +2,7 @@ import { defineStore } from "pinia"
 import { ref } from "vue"
 import axios from "axios"
 export const useUidManipulateStore = defineStore("uidManipulate", () => {
+  const selectedAccount = ref("")
   const showUidInput = ref(false)
   const gameUid = ref("")
   const gameUsername = ref("")
@@ -52,7 +53,24 @@ export const useUidManipulateStore = defineStore("uidManipulate", () => {
     }
   }
 
+  async function passAndSetUidInfo(user_GameInfo){
+    console.log(user_GameInfo)
+      if(user_GameInfo){
+        tempUid.value = user_GameInfo["game_uid"]
+        tempUsername.value = user_GameInfo["game_username"]
+        gameUid.value = user_GameInfo["game_uid"]
+        gameUsername.value = user_GameInfo["game_username"]
+        isMain.value = user_GameInfo["isMain"]
+      } else {
+        gameUid.value = ""
+        gameUsername.value = ""
+        tempUid.value = ""
+        tempUsername.value = ""
+      }
+  }
+
   return {
+    selectedAccount,
     showUidInput,
     tempUid,
     tempUsername,
@@ -62,6 +80,7 @@ export const useUidManipulateStore = defineStore("uidManipulate", () => {
     isMain,
     restoreUidValue,
     resetUidValue,
-    settleInputBug
+    settleInputBug,
+    passAndSetUidInfo
   }
 })

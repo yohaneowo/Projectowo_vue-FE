@@ -52,6 +52,7 @@ const fetchPlayerGameList = () => {
     .then((res) => {
       console.log("fetchuserGameList: AXIOS ", res.data)
       userGameList.value = res.data
+      
     })
     .catch((err) => {
       console.log(err)

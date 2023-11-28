@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.1.0",
+    "@vee-validate/rules": "^4.12.1",
     "aws-sdk": "^2.1473.0",
     "axios": "^1.5.1",
     "clipboard": "^2.0.11",

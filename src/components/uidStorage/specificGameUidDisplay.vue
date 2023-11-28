@@ -1,5 +1,96 @@
 <template>
-  <el-card class="box-card">
+  <div v-if="!editMode" class="displayMode">
+    <el-card class="box-card">
+      <template #header>
+        <div class="card-header">
+          <el-avatar
+            class="game-icon"
+            shape="square"
+            :size="75"
+            :src="`/src/assets/game_icons/${gameUidStorage.selectedGameId}/${gameUidStorage.selectedGameId}.png`"
+          ></el-avatar>
+
+          <span class="game-title">{{ gameNameTW }}</span>
+          <el-tooltip
+            class="edit-tooltip"
+            effect="dark"
+            content="这里可以修改你的东东"
+            placement="top"
+          >
+            <el-icon :size="20">
+              <Edit @click="handleEditMode" />
+            </el-icon>
+          </el-tooltip>
+        </div>
+      </template>
+      <div class="big_container">
+        <div class="account_list">
+        <!-- <el-button type="primary" plain>主賬號</el-button> -->
+     
+    <el-radio-group v-if="userGameInfo?.length > 0" v-model="uidManipulate.selectedAccount" class="account_radio_container">
+      <el-radio  :label="0" border class="account_radio"  @change="handleSelectedAccount(mainAccount[0])">主賬號</el-radio>
+      <div v-for="(subAccount, index) in subAccounts" :key="index" >
+        <el-radio :label="index + 1" border class="account_radio"  @change="handleSelectedAccount(subAccount)" >小號 {{index + 1}}</el-radio>
+      </div>
+    </el-radio-group>
+         <!-- <div v-for="subAccount in subAccounts"></div> -->
+      </div>
+        <el-divider direction="vertical" />
+
+        <div class="serverDisplay">
+          <div v-for="server in serverInfo">
+            <el-button
+              type="primary"
+              class="server_choser"
+              :loading="server.loading"
+              :plain="!server.loading"
+              @click="handleSelectServer(server)"
+              >{{ server.server_name }}</el-button
+            >
+          </div>
+        </div>
+
+        <el-divider direction="vertical" />
+
+        <div class="container_1">
+          <p>UID:</p>
+          <p>昵称:</p>
+        </div>
+        <div class="container_2">
+          <el-button
+            class="text_btn"
+            :data-clipboard-text="uidManipulate.gameUid"
+            @click="copy"
+            v-if="!editMode  && uidManipulate.gameUid"
+            >{{ uidManipulate.gameUid }}
+          </el-button>
+          <p
+            class="questionmark-text"
+            v-if="!editMode  && !uidManipulate.gameUid"
+          >
+            {{ uidManipulate.gameUid || "???" }}
+          </p>
+          <el-button
+            class="username_btn"
+            :data-clipboard-text="uidManipulate.gameUsername"
+            @click="copy"
+            v-if="!editMode && uidManipulate.gameUsername"
+            >{{ uidManipulate.gameUsername }}
+          </el-button>
+          <p
+            class="questionmark-text"
+            v-if="!editMode  && !uidManipulate.gameUsername"
+          >
+            {{ uidManipulate.gameUsername || "???" }}
+          </p>
+        </div>
+      </div> 
+
+
+    </el-card>
+  </div>
+  <div v-if="editMode" class="editMode">
+    <el-card class="box-card">
     <template #header>
       <div class="card-header">
         <el-avatar
@@ -8,7 +99,6 @@
           :size="75"
           :src="`/src/assets/game_icons/${gameUidStorage.selectedGameId}/${gameUidStorage.selectedGameId}.png`"
         ></el-avatar>
-
         <span class="game-title">{{ gameNameTW }}</span>
         <el-tooltip
           class="edit-tooltip"
@@ -17,7 +107,7 @@
           placement="top"
         >
           <el-icon :size="20">
-            <Edit @click="handleUidEdit" />
+            <Edit @click="handleEditMode" />
           </el-icon>
         </el-tooltip>
       </div>
@@ -42,59 +132,32 @@
         <p>昵称:</p>
       </div>
       <div class="container_2">
-        <el-button
-          class="text_btn"
-          :data-clipboard-text="uidManipulate.gameUid"
-          @click="copy"
-          v-if="showUid == true && uidManipulate.gameUid"
-          >{{ uidManipulate.gameUid }}
-        </el-button>
         <div class="t-input">
           <el-input
             class=""
-            v-if="editUid == true"
             v-model="uidManipulate.gameUid"
             placeholder="输入你的UID"
             clearable
           />
         </div>
-        <p
-          class="questionmark-text"
-          v-if="showUid == true && !uidManipulate.gameUid"
-        >
-          {{ uidManipulate.gameUid || "???" }}
-        </p>
-
-        <el-button
-          class="username_btn"
-          :data-clipboard-text="uidManipulate.gameUsername"
-          @click="copy"
-          v-if="showUid == true && uidManipulate.gameUsername"
-          >{{ uidManipulate.gameUsername }}
-        </el-button>
+    
+   
         <div class="t-input">
           <el-input
             class=""
-            v-if="editUid == true"
             v-model="uidManipulate.gameUsername"
             placeholder="输入你的昵称,不要那么懒"
             clearable
           />
         </div>
-        <p
-          class="questionmark-text"
-          v-if="showUid == true && !uidManipulate.gameUsername"
-        >
-          {{ uidManipulate.gameUsername || "???" }}
-        </p>
+   
       </div>
     </div> 
-     <el-radio-group v-if="editUid" v-model="uidManipulate.isMain"  @change="handleIsMainSelection" class="isMain-Radio">
+     <el-radio-group v-model="uidManipulate.isMain"  @change="handleIsMainSelection" class="isMain-Radio">
       <el-radio label="1" size="large"  >主賬號</el-radio>
       <el-radio label="0" size="large" >小號</el-radio>
     </el-radio-group>
-    <p>{{ values }}</p>
-    <div class="confirmation-button-container" v-if="editUid == true">
+    <div class="confirmation-button-container" >
       <el-button
         type="danger"
         plain
@@ -103,27 +166,33 @@
         >取消</el-button
       >
 
-      <el-button type="primary" plain size="large">确定</el-button>
+      <el-button type="primary" plain size="large"  @click="handleSubmit(onSubmit)">确定</el-button>
     </div>
 
   </el-card>
+  </div>
 </template>
 <script setup lang="ts">
+
+const dummy = [
+  {test: 'test'},
+  {test: 'test'},
+  {test: 'test'},
+]
 import axios from "axios"
 import { ref, reactive, computed, defineProps, onMounted } from "vue"
 import { useGameUidStorageStore } from "./../../stores/uidStorage.ts"
 import { useUidManipulateStore } from "./../../stores/uidManipulate.ts"
 import Clipboard from "clipboard"
-import { useForm } from 'vee-validate';
+import { useForm, defineRule ,ErrorMessage,Form ,Field} from 'vee-validate';
 const gameUidStorage = useGameUidStorageStore()
 const uidManipulate = useUidManipulateStore()
 const userGameInfo = ref()
 const gameInfo = ref()
 const serverInfo = ref()
-const showUid = ref(true)
-const editUid = ref(false)
-const { values, defineField } = useForm();
-
+const editMode = ref(false)
+const mainAccount = ref()
+const subAccounts = ref()
 const copy = () => {
   const clipboard = new Clipboard(".text")
   clipboard.on("success", (e) => {
@@ -147,58 +216,57 @@ const gameNameTW = computed(() => {
   }
   return ""
 })
+const handleSelectedAccount = (account) => {
+  console.log(account)
+    const selectedAccount_user = userGameInfo.value.find(
+    (user) => user.game_uid == account.game_uid
+  )
+  console.log(selectedAccount_user)
+  if(selectedAccount_user){
+      uidManipulate.passAndSetUidInfo(selectedAccount_user)
+      serverInfo.value.forEach((server) => (server.loading = false))
+      serverInfo.value.find((s) => s.server_id == account.server_id).loading = true
 
+  }
+    console.log(`handleAccountSelection ${uidManipulate.selectedAccount}`);
+}
 const handleSelectServer = (server) => {
   // 重置所有selected的状态
   serverInfo.value.forEach((server) => (server.loading = false))
   serverInfo.value.find((s) => s.server_id == server.server_id).loading = true
-  const selectedServer = userGameInfo.value.find(
+  console.log(`xcheck now userGameInfo.value: ${userGameInfo.value}`)
+  console.log(userGameInfo.value)
+  const selectedServer_user = userGameInfo.value.find(
     (s) => s.server_id == server.server_id
   )
+  const test = userGameInfo.value.filter(
+    (s) => s.server_id == server.server_id
+  )
+  const selectedServer_userIndex = userGameInfo.value.findIndex((s) => s.server_id == server.server_id);
+  console.log(selectedServer_userIndex) 
+  uidManipulate.selectedAccount = selectedServer_userIndex
+  console.log("selectedServer:", selectedServer_user)
   console.log("什麼鬼為什麼沒有")
-  if (selectedServer) {
-    console.log("草")
+  // console.log(selectedServer_user)
+  console.log(test)
+  uidManipulate.passAndSetUidInfo(selectedServer_user)
 
-    uidManipulate.tempUid = selectedServer["game_uid"]
-    uidManipulate.tempUsername = selectedServer["game_username"]
-    // uidManipulate.gameUid = uidManipulate.gameUid
-    //   ? (uidManipulate.gameUid = selectedServer["game_uid"])
-    //   : null
-    // uidManipulate.gameUsername = uidManipulate.gameUsername
-    //   ? (uidManipulate.gameUsername = selectedServer["game_username"])
-    //   : null
-    uidManipulate.gameUid = selectedServer["game_uid"]
-    uidManipulate.gameUsername = selectedServer["game_username"]
-    uidManipulate.isMain = selectedServer["isMain"]
-    console.log(`CHECK USER 888 ${selectedServer["isMain"]}`)
-    console.log(`CHECK USER 888 ${selectedServer["game_uid"]}`)
-    console.log(`CHECK USER 888 ${selectedServer["game_uid"]}`)
-    console.log(`CHECK USER 888 ${selectedServer["game_username"]}`)
-    console.log("HERE uidManipulate.gameUid:", uidManipulate.gameUid)
-    console.log("HERE uidManipulate.gameUsername:", uidManipulate.gameUsername)
-  } else {
-    console.log("真的没有吧我草")
-    // console.log(`CHECK USER 888 ${selectedServer["game_uid"]}`)
-    // console.log(`CHECK USER 888 ${selectedServer["game_username"]}`)
-    // console.log("HERE uidManipulate.gameUid:", uidManipulate.gameUid)
-    // console.log("HERE uidManipulate.gameUsername:", uidManipulate.gameUsername)
-    uidManipulate.gameUid = ""
-    uidManipulate.gameUsername = ""
-    uidManipulate.tempUid = ""
-    uidManipulate.tempUsername = ""
-  }
 }
 
-const handleUidEdit = () => {
+const handleEditMode = () => {
   console.log("handleUidEdit")
-  showUid.value = false
-  editUid.value = true
+  editMode.value = !editMode.value
+  // 返回display模式时候还原数据
+  if(!editMode.value){
+    uidManipulate.restoreUidValue()
+  }
 }
 
 const handleIsMainSelection = () => {
     console.log(`handleIsMainRadio ${uidManipulate.isMain}`);
-
 }
+
+
 
 const handleUidManipulateCancel = async () => {
   uidManipulate.settleInputBug()
@@ -208,20 +276,17 @@ const handleUidManipulateCancel = async () => {
   ) {
     const isCancel = await gameUidStorage.handleCancelConfirmation()
     console.log("isCancel:", isCancel)
-
     if (isCancel) {
-      showUid.value = true
-      editUid.value = false
+      editMode.value = false
       uidManipulate.restoreUidValue()
     }
   } else {
     console.log("tempUidAA is empty")
-    showUid.value = true
-    editUid.value = false
+    editMode.value = false
   }
 }
 const startingFunc = async () => {
-  console.log("===============START HERE===================")
+  console.log("===============START HERE===================1")
   gameInfo.value = await gameUidStorage.fetchGameInfo()
   console.log("===============START HERE===================2")
   serverInfo.value = await gameUidStorage.fetchSelectedGameServerInfo()
@@ -231,6 +296,12 @@ const startingFunc = async () => {
   console.log("===============START HERE===================4")
 
   const hasMain = userGameInfo.value.some((s) => s.isMain == 1)
+  mainAccount.value = userGameInfo.value.filter((s) => s.isMain == 1)
+  subAccounts.value = userGameInfo.value.filter((s) => s.isMain == 0)
+  console.log("===============START HERE===================5")
+  console.log(userGameInfo.value)
+  console.log(mainAccount.value)
+  console.log(subAccounts.value)
   console.log(`hasMain: ${hasMain}`)
   if (hasMain) {
     // 正常来说handleSelectServer只接受server对象,这个是取巧的方法
@@ -251,6 +322,13 @@ const startingFunc = async () => {
   // console.log("===============END HERE===================")
 }
 onMounted(startingFunc)
+ const { defineField, handleSubmit, resetForm, values, errors } = useForm();
+const onSubmit = () => {
+  if (!errors.value.$anyError) {
+    // 表单验证通过，执行提交逻辑
+    console.log('提交表单');
+  }
+};
 </script>
 
 <style scoped>
@@ -344,6 +422,14 @@ onMounted(startingFunc)
   z-index: 9999;
 }
 
+.account_radio_container{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
 
-
+.account_radio {
+  margin : 2px
+}
 </style>

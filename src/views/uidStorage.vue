@@ -123,11 +123,12 @@ const closeCard = async () => {
     console.log(`uidManipulate.gameUsername: ${uidManipulate.gameUsername}`)
     // 如果有修改過，就要跳出確認視窗
     console.log("=============================================================")
-
+    uidManipulate.settleInputBug()
     if (
       uidManipulate.tempUid != uidManipulate.gameUid ||
       uidManipulate.tempUsername != uidManipulate.gameUsername
     ) {
+     
       const isCancel = await gameUidStorage.handleCancelConfirmation()
       if (isCancel) {
         gameUidStorage.showSpecificGameUidDisplay = false
