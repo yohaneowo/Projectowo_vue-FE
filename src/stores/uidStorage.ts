@@ -48,7 +48,7 @@ export const useGameUidStorageStore = defineStore("gameUidStorage", () => {
       console.log("NITAMAGAOWO?")
       return response.data.map((server) => ({
         ...server,
-        loading: false
+        button_enable: false
       }))
     } catch (error) {
       console.log(error)

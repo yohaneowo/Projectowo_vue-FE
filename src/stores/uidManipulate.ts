@@ -2,7 +2,7 @@ import { defineStore } from "pinia"
 import { ref } from "vue"
 import axios from "axios"
 export const useUidManipulateStore = defineStore("uidManipulate", () => {
-  const selectedAccount = ref("")
+  const selectAccount_Index = ref("")
   const showUidInput = ref(false)
   const gameUid = ref("")
   const gameUsername = ref("")
@@ -28,6 +28,8 @@ export const useUidManipulateStore = defineStore("uidManipulate", () => {
       tempUid.value = null
       tempUsername.value = null
       isMain.value = null
+      selectAccount_Index.value = null
+
     } catch (error) {
       console.log(error)
     }
@@ -70,7 +72,7 @@ export const useUidManipulateStore = defineStore("uidManipulate", () => {
   }
 
   return {
-    selectedAccount,
+    selectAccount_Index,
     showUidInput,
     tempUid,
     tempUsername,

@@ -27,10 +27,11 @@
         <div class="account_list">
         <!-- <el-button type="primary" plain>主賬號</el-button> -->
      
-    <el-radio-group v-if="userGameInfo?.length > 0" v-model="uidManipulate.selectedAccount" class="account_radio_container">
-      <el-radio  :label="0" border class="account_radio"  @change="handleSelectedAccount(mainAccount[0])">主賬號</el-radio>
+    <el-radio-group v-if="userGameInfo?.length > 0" v-model="uidManipulate.selectAccount_Index" class="account_radio_container">
+      <el-radio  :label="0" border class="account_radio"  @change="handleSelectAccount(mainAccount[0])">主賬號</el-radio>
       <div v-for="(subAccount, index) in subAccounts" :key="index" >
-        <el-radio :label="index + 1" border class="account_radio"  @change="handleSelectedAccount(subAccount)" >小號 {{index + 1}}</el-radio>
+        <el-radio :label="index + 1" border class="account_radio"  @change="handleSelectAccount(subAccount)" >小號 {{index + 1}}</el-radio>
+        <!-- <div v-if="shouldModify(subAccount)" ></div> -->
       </div>
     </el-radio-group>
          <!-- <div v-for="subAccount in subAccounts"></div> -->
@@ -42,8 +43,8 @@
             <el-button
               type="primary"
               class="server_choser"
-              :loading="server.loading"
-              :plain="!server.loading"
+              :loading="server.button_enable"
+              :plain="!server.button_enable"
               @click="handleSelectServer(server)"
               >{{ server.server_name }}</el-button
             >
@@ -118,8 +119,8 @@
           <el-button
             type="primary"
             class="server_choser"
-            :loading="server.loading"
-            :plain="!server.loading"
+            :loading="server.button_enable"
+            :plain="!server.button_enable"
             @click="handleSelectServer(server)"
             >{{ server.server_name }}</el-button
           >
@@ -174,11 +175,7 @@
 </template>
 <script setup lang="ts">
 
-const dummy = [
-  {test: 'test'},
-  {test: 'test'},
-  {test: 'test'},
-]
+
 import axios from "axios"
 import { ref, reactive, computed, defineProps, onMounted } from "vue"
 import { useGameUidStorageStore } from "./../../stores/uidStorage.ts"
@@ -216,45 +213,52 @@ const gameNameTW = computed(() => {
   }
   return ""
 })
-const handleSelectedAccount = (account) => {
-  console.log(account)
-    const selectedAccount_user = userGameInfo.value.find(
-    (user) => user.game_uid == account.game_uid
-  )
-  console.log(selectedAccount_user)
-  if(selectedAccount_user){
-      uidManipulate.passAndSetUidInfo(selectedAccount_user)
-      serverInfo.value.forEach((server) => (server.loading = false))
-      serverInfo.value.find((s) => s.server_id == account.server_id).loading = true
 
-  }
-    console.log(`handleAccountSelection ${uidManipulate.selectedAccount}`);
+const handleSelectAccount = (account) => {
+  uidManipulate.passAndSetUidInfo(account)
+  serverInfo.value.forEach((server) => (server.button_enable = false))
+  serverInfo.value.find((s) => s.server_id == account.server_id).button_enable = true
+  const index = findAccountIndex(account)
+  uidManipulate.selectAccount_Index == false ? uidManipulate.selectAccount_Index = index : null
 }
+
 const handleSelectServer = (server) => {
-  // 重置所有selected的状态
-  serverInfo.value.forEach((server) => (server.loading = false))
-  serverInfo.value.find((s) => s.server_id == server.server_id).loading = true
-  console.log(`xcheck now userGameInfo.value: ${userGameInfo.value}`)
-  console.log(userGameInfo.value)
-  const selectedServer_user = userGameInfo.value.find(
-    (s) => s.server_id == server.server_id
+  serverInfo.value.forEach((server) => (server.button_enable = false))
+  serverInfo.value.find((s) => s.server_id == server.server_id).button_enable = true
+  const {foundAccount, foundAccount_Index} =  findAccountByGameServer(server)
+  uidManipulate.passAndSetUidInfo(foundAccount)
+  uidManipulate.selectAccount_Index = foundAccount_Index
+}
+const findAccountIndex = (entity) => {
+  return userGameInfo.value.findIndex((user) => user.server_id == entity.server_id ) ||
+  userGameInfo.value.findIndex((user) => user.server_id == entity.server_id && user.isMain == 1)
+}
+
+const findAccountByGameServer = (gameServer) => {
+  const findMainAccount  = userGameInfo.value.find(
+    (user) => user.server_id == gameServer.server_id && user.isMain == 1
   )
-  const test = userGameInfo.value.filter(
-    (s) => s.server_id == server.server_id
-  )
-  const selectedServer_userIndex = userGameInfo.value.findIndex((s) => s.server_id == server.server_id);
-  console.log(selectedServer_userIndex) 
-  uidManipulate.selectedAccount = selectedServer_userIndex
-  console.log("selectedServer:", selectedServer_user)
-  console.log("什麼鬼為什麼沒有")
-  // console.log(selectedServer_user)
-  console.log(test)
-  uidManipulate.passAndSetUidInfo(selectedServer_user)
+  if(typeof findMainAccount == 'undefined'){
+    const findSubAccount  = userGameInfo.value.find(
+        (user) => user.server_id == gameServer.server_id 
+      )
+    // const findSubAccount_Index = userGameInfo.value.findIndex((user) => user.server_id == gameServer.server_id )
+    const findSubAccount_Index = findAccountIndex(gameServer)
+      return {
+        foundAccount: findSubAccount,
+        foundAccount_Index: findSubAccount_Index
+      }
+  } else {
+    const findMainAccount_Index = findAccountIndex(gameServer)
+      return {
+        foundAccount: findMainAccount,
+        foundAccount_Index: findMainAccount_Index
+      }
+  }
 
 }
 
 const handleEditMode = () => {
-  console.log("handleUidEdit")
   editMode.value = !editMode.value
   // 返回display模式时候还原数据
   if(!editMode.value){
@@ -265,7 +269,6 @@ const handleEditMode = () => {
 const handleIsMainSelection = () => {
     console.log(`handleIsMainRadio ${uidManipulate.isMain}`);
 }
-
 
 
 const handleUidManipulateCancel = async () => {
@@ -285,50 +288,33 @@ const handleUidManipulateCancel = async () => {
     editMode.value = false
   }
 }
-const startingFunc = async () => {
-  console.log("===============START HERE===================1")
+const starter = async () => {
   gameInfo.value = await gameUidStorage.fetchGameInfo()
-  console.log("===============START HERE===================2")
   serverInfo.value = await gameUidStorage.fetchSelectedGameServerInfo()
-  console.log("===============START HERE===================3")
-
   userGameInfo.value = await gameUidStorage.fetchUserGameInfo()
-  console.log("===============START HERE===================4")
-
-  const hasMain = userGameInfo.value.some((s) => s.isMain == 1)
+  const hasMain = userGameInfo.value.some((user) => user.isMain == 1)
   mainAccount.value = userGameInfo.value.filter((s) => s.isMain == 1)
   subAccounts.value = userGameInfo.value.filter((s) => s.isMain == 0)
-  console.log("===============START HERE===================5")
-  console.log(userGameInfo.value)
-  console.log(mainAccount.value)
-  console.log(subAccounts.value)
-  console.log(`hasMain: ${hasMain}`)
   if (hasMain) {
-    // 正常来说handleSelectServer只接受server对象,这个是取巧的方法
-    handleSelectServer(userGameInfo.value.find((s) => s.isMain == 1))
+    handleSelectAccount(userGameInfo.value.find((s) => s.isMain == 1))
   } else {
-    console.log(uidManipulate)
-
-    console.log("BABABABBABA NANA")
     uidManipulate.resetUidValue()
-    console.log(uidManipulate)
-    console.log("BABABABBABA NANA2")
-
-    // uidManipulate.gameUsername = null
-    // uidManipulate.gameUid = null
-    // uidManipulate.tempUid = null
-    // uidManipulate.tempUsername = null
   }
-  // console.log("===============END HERE===================")
 }
-onMounted(startingFunc)
- const { defineField, handleSubmit, resetForm, values, errors } = useForm();
+onMounted(starter)
+
+
 const onSubmit = () => {
   if (!errors.value.$anyError) {
     // 表单验证通过，执行提交逻辑
     console.log('提交表单');
   }
 };
+
+// const shouldModify= (index) =>{
+//       // 判断是否需要修改
+//     return this.modifiedIndexes.includes(index);
+// }
 </script>
 
 <style scoped>
