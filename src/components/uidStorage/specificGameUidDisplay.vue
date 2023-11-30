@@ -215,11 +215,12 @@ const gameNameTW = computed(() => {
 })
 
 const handleSelectAccount = (account) => {
+  console.log(`handleSelectAccount: ${account}`)
   uidManipulate.passAndSetUidInfo(account)
   serverInfo.value.forEach((server) => (server.button_enable = false))
   serverInfo.value.find((s) => s.server_id == account.server_id).button_enable = true
-  const index = findAccountIndex(account)
-  uidManipulate.selectAccount_Index == false ? uidManipulate.selectAccount_Index = index : null
+  const index = findAccountIndex(account) 
+ uidManipulate.selectAccount_Index = index 
 }
 
 const handleSelectServer = (server) => {
@@ -230,11 +231,14 @@ const handleSelectServer = (server) => {
   uidManipulate.selectAccount_Index = foundAccount_Index
 }
 const findAccountIndex = (entity) => {
-  return userGameInfo.value.findIndex((user) => user.server_id == entity.server_id ) ||
-  userGameInfo.value.findIndex((user) => user.server_id == entity.server_id && user.isMain == 1)
-}
+   const isMainIndex = userGameInfo.value.findIndex(
+    (user) => user.server_id == entity.server_id && entity.isMain == 1
+  );
+  return isMainIndex != -1 ? isMainIndex : userGameInfo.value.findIndex(
+    (user) => user.game_uid == entity.game_uid )
+ }
 
-const findAccountByGameServer = (gameServer) => {
+const findAccountByGameServer  = (gameServer) => {
   const findMainAccount  = userGameInfo.value.find(
     (user) => user.server_id == gameServer.server_id && user.isMain == 1
   )
