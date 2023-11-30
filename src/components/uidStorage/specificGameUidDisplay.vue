@@ -227,10 +227,13 @@ const handleSelectServer = (server) => {
   serverInfo.value.forEach((server) => (server.button_enable = false))
   serverInfo.value.find((s) => s.server_id == server.server_id).button_enable = true
   const {foundAccount, foundAccount_Index} =  findAccountByGameServer(server)
+  console.log(`foundAccount_Index: ${foundAccount_Index}`)
   uidManipulate.passAndSetUidInfo(foundAccount)
   uidManipulate.selectAccount_Index = foundAccount_Index
 }
 const findAccountIndex = (entity) => {
+  // console.log(entity)
+  if(typeof entity == 'undefined') return ''
    const isMainIndex = userGameInfo.value.findIndex(
     (user) => user.server_id == entity.server_id && entity.isMain == 1
   );
@@ -247,13 +250,13 @@ const findAccountByGameServer  = (gameServer) => {
         (user) => user.server_id == gameServer.server_id 
       )
     // const findSubAccount_Index = userGameInfo.value.findIndex((user) => user.server_id == gameServer.server_id )
-    const findSubAccount_Index = findAccountIndex(gameServer)
+    const findSubAccount_Index = findAccountIndex(findSubAccount)
       return {
         foundAccount: findSubAccount,
         foundAccount_Index: findSubAccount_Index
       }
   } else {
-    const findMainAccount_Index = findAccountIndex(gameServer)
+    const findMainAccount_Index = findAccountIndex(findMainAccount)
       return {
         foundAccount: findMainAccount,
         foundAccount_Index: findMainAccount_Index

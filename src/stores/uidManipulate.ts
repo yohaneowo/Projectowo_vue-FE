@@ -44,7 +44,10 @@ export const useUidManipulateStore = defineStore("uidManipulate", () => {
       /* 
     當Input輸入值後然後刪除,原先綁定的v-model會變成空字串而不是null
     */
-
+      tempUid.value == "" ? (tempUid.value = null) : tempUid.value
+      tempUsername.value == ""
+        ? (tempUsername.value = null)
+        : tempUsername.value
       gameUid.value == "" ? (gameUid.value = null) : gameUid.value
       gameUsername.value == ""
         ? (gameUsername.value = null)

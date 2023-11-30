@@ -118,6 +118,7 @@ const closeCard = async () => {
   // 如果card開著才有要關的必要
   if (gameUidStorage.showSpecificGameUidDisplay == true) {
     console.log(`uidManipulate.tempUid: ${uidManipulate.tempUid}`)
+    console.log(typeof uidManipulate.tempUid)
     console.log(`uidManipulate.tempUsername: ${uidManipulate.tempUsername}`)
     console.log(`uidManipulate.gameUid: ${uidManipulate.gameUid}`)
     console.log(`uidManipulate.gameUsername: ${uidManipulate.gameUsername}`)
