@@ -1,15 +1,34 @@
 import { defineStore } from "pinia"
 import { ref } from "vue"
 import axios from "axios"
-export const useUidManipulateStore = defineStore("uidManipulate", () => {
+
+interface UidManipulateStore {
+  game_uid: Ref<string | null>;
+  game_username: Ref<string | null>;
+  isMain: Ref<string | null>;
+  user_comment : Ref<string | null>;
+  selectAccount_Index: Ref<string>;
+  tempUid: Ref<string | null>;
+  tempUsername: Ref<string | null>;
+  tempIsMain: Ref<string | null>;
+  tempUserComment: Ref<string | null>;
+  restoreUidValue: () => Promise<void>;
+  resetUidValue: () => Promise<void>;
+  settleInputBug: () => Promise<void>;
+  passAndSetUidInfo: (userGameInfo: UserGameInfo | null) => void;
+}
+
+export const useUidManipulateStore:UidManipulateStore = defineStore("uidManipulate", () => {
   const selectAccount_Index = ref("")
-  const showUidInput = ref(false)
   const gameUid = ref("")
   const gameUsername = ref("")
   const isMain = ref("")
   const tempUid = ref("")
   const tempUsername = ref("")
   const tempIsMain = ref("")
+
+
+
   async function restoreUidValue() {
     try {
       tempUid.value ? (gameUid.value = tempUid.value) : (gameUid.value = null)
@@ -76,7 +95,6 @@ export const useUidManipulateStore = defineStore("uidManipulate", () => {
 
   return {
     selectAccount_Index,
-    showUidInput,
     tempUid,
     tempUsername,
     tempIsMain,

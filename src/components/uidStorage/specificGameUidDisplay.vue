@@ -114,61 +114,9 @@
       </div>
     </template>
     <div class="big_container">
-      <div class="serverDisplay">
-        <div v-for="server in serverInfo">
-          <el-button
-            type="primary"
-            class="server_choser"
-            :loading="server.button_enable"
-            :plain="!server.button_enable"
-            @click="handleSelectServer(server)"
-            >{{ server.server_name }}</el-button
-          >
-        </div>
-      </div>
-      <el-divider direction="vertical" />
-
-      <div class="container_1">
-        <p>UID:</p>
-        <p>昵称:</p>
-      </div>
-      <div class="container_2">
-        <div class="t-input">
-          <el-input
-            class=""
-            v-model="uidManipulate.gameUid"
-            placeholder="输入你的UID"
-            clearable
-          />
-        </div>
-    
-   
-        <div class="t-input">
-          <el-input
-            class=""
-            v-model="uidManipulate.gameUsername"
-            placeholder="输入你的昵称,不要那么懒"
-            clearable
-          />
-        </div>
-   
-      </div>
+      <uidEditComponent :userGameInfo="userGameInfo" :gameInfo="gameInfo" :serverInfo="serverInfo"></uidEditComponent>
     </div> 
-     <el-radio-group v-model="uidManipulate.isMain"  @change="handleIsMainSelection" class="isMain-Radio">
-      <el-radio label="1" size="large"  >主賬號</el-radio>
-      <el-radio label="0" size="large" >小號</el-radio>
-    </el-radio-group>
-    <div class="confirmation-button-container" >
-      <el-button
-        type="danger"
-        plain
-        size="large"
-        @click="handleUidManipulateCancel"
-        >取消</el-button
-      >
-
-      <el-button type="primary" plain size="large"  @click="handleSubmit(onSubmit)">确定</el-button>
-    </div>
+ 
 
   </el-card>
   </div>
@@ -180,6 +128,7 @@ import axios from "axios"
 import { ref, reactive, computed, defineProps, onMounted } from "vue"
 import { useGameUidStorageStore } from "./../../stores/uidStorage.ts"
 import { useUidManipulateStore } from "./../../stores/uidManipulate.ts"
+
 import Clipboard from "clipboard"
 import { useForm, defineRule ,ErrorMessage,Form ,Field} from 'vee-validate';
 const gameUidStorage = useGameUidStorageStore()

@@ -22,6 +22,9 @@ declare module 'vue' {
     ElRadio: typeof import('element-plus/es')['ElRadio']
     ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']
     ElRow: typeof import('element-plus/es')['ElRow']
+    ElTable: typeof import('element-plus/es')['ElTable']
+    ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
+    ElTag: typeof import('element-plus/es')['ElTag']
     ElText: typeof import('element-plus/es')['ElText']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     GameRanking: typeof import('./src/components/uidStorage/gameRanking.vue')['default']
@@ -37,6 +40,7 @@ declare module 'vue' {
     SpecificGamePlayerDisplay: typeof import('./src/components/uidStorage/specificGamePlayerDisplay.vue')['default']
     SpecificGameUidDisplay: typeof import('./src/components/uidStorage/specificGameUidDisplay.vue')['default']
     UidDisplay: typeof import('./src/components/uidStorage/uidDisplay.vue')['default']
+    UidEditComponent: typeof import('./src/components/uidStorage/uidEditComponent.vue')['default']
     UidRanking: typeof import('./src/components/uidStorage/uidRanking.vue')['default']
   }
   export interface ComponentCustomProperties {
