@@ -56,10 +56,28 @@
                 
               </template>
             </el-table-column>
-          <el-table-column  label="遊戲暱稱">
-        
+          <el-table-column  label="遊戲暱稱" width="150">
+           <template #default="{ row, $index }">
+                <span v-show="editTableIndex != $index">{{ row.game_username || "???"}}</span>
+                  <div v-show="editTableIndex == $index" >
+                    <el-input  v-model="uidManipulate.userGameInfo[$index].game_username" placeholder="輸入遊戲暱稱" clearable />
+                  </div>
+              </template>
           </el-table-column >
-          <el-table-column prop="user_comment" label="留言"  ></el-table-column>
+          <el-table-column prop="user_comment" label="留言" width="150" >
+            <template #default="{ row, $index }">
+              <el-popover
+                placement="left-start"
+                :title="uidManipulate.userGameInfo[$index].user_comment || '無留言' "
+                :width="200"
+                trigger="hover"
+              >
+                <template #reference>
+                  <el-button class="m-2">{{ truncateComment(uidManipulate.userGameInfo[$index].user_comment,3) || '???'  }}</el-button>
+                </template>
+              </el-popover>
+            </template>
+          </el-table-column>
           <el-table-column label="操作"  width="120">
             <template #default="{ row, $index }">
               <div v-show="editTableIndex != $index" style="display: flex">
@@ -125,6 +143,15 @@ const validationRules = {
   user_comment: [
     { required: true, message: '請輸入留言', trigger: 'blur' },
   ],
+}
+
+function truncateComment(str: string, maxLength: number): string | null {
+  if(str == null) return null
+  if (str?.length <= maxLength) {
+      return str;
+  } else {
+      return str.slice(0, maxLength) + '...';
+  }
 }
 
 
