@@ -1,17 +1,47 @@
 import { defineStore } from "pinia"
-import { ref } from "vue"
+import { ref ,reactive} from "vue"
 import axios from "axios"
 
+interface UserGameInfo {
+  user_id: string | null
+  server_id: Number | null;
+  game_id : Number | null;
+  game_uid: String | null;
+  game_username: String | null;
+  isMain: String | null;
+  user_comment: String | null;
+
+}
+
+interface ServerInfo {
+  server_id: Number | null;
+  game_id: Number | null;
+  server_name: String | null;
+  button_enable: Boolean | null;
+}
+
+interface GameInfo {
+  game_id: Number | null;
+  'gameName_zh-TW' : String | null;
+  'gameName_en-US' : String | null;
+  series_id: Number | null;
+  description_1 : String | null;
+  description_2 : String | null;
+  danger_description : String | null;
+}
 interface UidManipulateStore {
-  game_uid: Ref<string | null>;
-  game_username: Ref<string | null>;
-  isMain: Ref<string | null>;
-  user_comment : Ref<string | null>;
-  selectAccount_Index: Ref<string>;
-  tempUid: Ref<string | null>;
-  tempUsername: Ref<string | null>;
-  tempIsMain: Ref<string | null>;
-  tempUserComment: Ref<string | null>;
+  userGameInfo: UserGameInfo | null;
+  serverInfo: ServerInfo | null;
+  gameInfo: GameInfo | null;
+  game_uid: string | null;
+  game_username: string | null;
+  isMain: string | null;
+  user_comment : string | null;
+  selectAccount_Index: string;
+  tempUid: string | null;
+  tempUsername: string | null;
+  tempIsMain: string | null;
+  tempUserComment: string | null;
   restoreUidValue: () => Promise<void>;
   resetUidValue: () => Promise<void>;
   settleInputBug: () => Promise<void>;
@@ -19,6 +49,34 @@ interface UidManipulateStore {
 }
 
 export const useUidManipulateStore:UidManipulateStore = defineStore("uidManipulate", () => {
+  const userGameInfo: UserGameInfo = reactive({
+    user_id: ref(null),
+    server_id: ref(null),
+    game_id: ref(null),
+    game_uid: ref(null),
+    game_username: ref(null),
+    isMain: ref(null),
+    user_comment: ref(null),
+    
+  })
+
+  const serverInfo: ServerInfo = reactive({
+    server_id: ref(null),
+    game_id: ref(null),
+    server_name: ref(null),
+    button_enable: ref(null),
+  })
+  const gameInfo: GameInfo = reactive({
+    game_id: ref(null),
+    'gameName_zh-TW': ref(null),
+    'gameName_en-US': ref(null),
+    series_id: ref(null),
+    description_1: ref(null),
+    description_2: ref(null),
+    danger_description: ref(null),
+  })
+
+
   const selectAccount_Index = ref("")
   const gameUid = ref("")
   const gameUsername = ref("")
@@ -26,7 +84,7 @@ export const useUidManipulateStore:UidManipulateStore = defineStore("uidManipula
   const tempUid = ref("")
   const tempUsername = ref("")
   const tempIsMain = ref("")
-
+  
 
 
   async function restoreUidValue() {
@@ -94,6 +152,10 @@ export const useUidManipulateStore:UidManipulateStore = defineStore("uidManipula
   }
 
   return {
+    
+    userGameInfo,
+    serverInfo,
+    gameInfo,
     selectAccount_Index,
     tempUid,
     tempUsername,

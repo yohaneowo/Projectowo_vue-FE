@@ -39,14 +39,14 @@
         <el-divider direction="vertical" />
 
         <div class="serverDisplay">
-          <div v-for="server in serverInfo">
+          <div v-for="server in uidManipulate.serverInfo">
             <el-button
               type="primary"
               class="server_choser"
-              :loading="server.button_enable"
-              :plain="!server.button_enable"
+              :loading="server?.button_enable"
+              :plain="!server?.button_enable"
               @click="handleSelectServer(server)"
-              >{{ server.server_name }}</el-button
+              >{{ server?.server_name }}</el-button
             >
           </div>
         </div>
@@ -157,8 +157,8 @@ const copy = () => {
 }
 
 const gameNameTW = computed(() => {
-  if (gameInfo.value && gameInfo.value.length > 0) {
-    return gameInfo.value[0]["gameName_zh-TW"]
+  if (uidManipulate.gameInfo && uidManipulate.gameInfo.length > 0) {
+    return uidManipulate.gameInfo[0]["gameName_zh-TW"]
   }
   return ""
 })
@@ -166,15 +166,15 @@ const gameNameTW = computed(() => {
 const handleSelectAccount = (account) => {
   console.log(`handleSelectAccount: ${account}`)
   uidManipulate.passAndSetUidInfo(account)
-  serverInfo.value.forEach((server) => (server.button_enable = false))
-  serverInfo.value.find((s) => s.server_id == account.server_id).button_enable = true
+  uidManipulate.serverInfo.forEach((server) => (server.button_enable = false))
+  uidManipulate.serverInfo.find((s) => s.server_id == account.server_id).button_enable = true
   const index = findAccountIndex(account) 
  uidManipulate.selectAccount_Index = index 
 }
 
 const handleSelectServer = (server) => {
-  serverInfo.value.forEach((server) => (server.button_enable = false))
-  serverInfo.value.find((s) => s.server_id == server.server_id).button_enable = true
+  uidManipulate.serverInfo.forEach((server) => (server.button_enable = false))
+  uidManipulate.serverInfo.find((s) => s.server_id == server.server_id).button_enable = true
   const {foundAccount, foundAccount_Index} =  findAccountByGameServer(server)
   console.log(`foundAccount_Index: ${foundAccount_Index}`)
   uidManipulate.passAndSetUidInfo(foundAccount)
@@ -183,19 +183,19 @@ const handleSelectServer = (server) => {
 const findAccountIndex = (entity) => {
   // console.log(entity)
   if(typeof entity == 'undefined') return ''
-   const isMainIndex = userGameInfo.value.findIndex(
+   const isMainIndex = uidManipulate.userGameInfo.findIndex(
     (user) => user.server_id == entity.server_id && entity.isMain == 1
   );
-  return isMainIndex != -1 ? isMainIndex : userGameInfo.value.findIndex(
+  return isMainIndex != -1 ? isMainIndex : uidManipulate.userGameInfo.findIndex(
     (user) => user.game_uid == entity.game_uid )
  }
 
 const findAccountByGameServer  = (gameServer) => {
-  const findMainAccount  = userGameInfo.value.find(
+  const findMainAccount  = uidManipulate.userGameInfo.find(
     (user) => user.server_id == gameServer.server_id && user.isMain == 1
   )
   if(typeof findMainAccount == 'undefined'){
-    const findSubAccount  = userGameInfo.value.find(
+    const findSubAccount  = uidManipulate.userGameInfo.find(
         (user) => user.server_id == gameServer.server_id 
       )
     // const findSubAccount_Index = userGameInfo.value.findIndex((user) => user.server_id == gameServer.server_id )
@@ -245,14 +245,18 @@ const handleUidManipulateCancel = async () => {
   }
 }
 const starter = async () => {
-  gameInfo.value = await gameUidStorage.fetchGameInfo()
-  serverInfo.value = await gameUidStorage.fetchSelectedGameServerInfo()
+  uidManipulate.gameInfo = await gameUidStorage.fetchGameInfo()
+  uidManipulate.serverInfo = await gameUidStorage.fetchSelectedGameServerInfo()
   userGameInfo.value = await gameUidStorage.fetchUserGameInfo()
-  const hasMain = userGameInfo.value.some((user) => user.isMain == 1)
-  mainAccount.value = userGameInfo.value.filter((s) => s.isMain == 1)
-  subAccounts.value = userGameInfo.value.filter((s) => s.isMain == 0)
+  uidManipulate.userGameInfo = await gameUidStorage.fetchUserGameInfo()
+  console.log(uidManipulate.serverInfo)
+  console.log(userGameInfo.value)
+  console.log(uidManipulate.userGameInfo)
+  const hasMain = uidManipulate.userGameInfo.some((user) => user.isMain == 1)
+  mainAccount.value = uidManipulate.userGameInfo.filter((s) => s.isMain == 1)
+  subAccounts.value = uidManipulate.userGameInfo.filter((s) => s.isMain == 0)
   if (hasMain) {
-    handleSelectAccount(userGameInfo.value.find((s) => s.isMain == 1))
+    handleSelectAccount(uidManipulate.userGameInfo.find((s) => s.isMain == 1))
   } else {
     uidManipulate.resetUidValue()
   }
