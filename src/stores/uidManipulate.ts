@@ -1,6 +1,7 @@
 import { defineStore } from "pinia"
 import { ref ,reactive} from "vue"
 import axios from "axios"
+import type { FormInstance, FormRules } from 'element-plus'
 
 interface UserGameInfo {
   user_id: string | null
@@ -49,17 +50,63 @@ interface UidManipulateStore {
 }
 
 export const useUidManipulateStore:UidManipulateStore = defineStore("uidManipulate", () => {
-  const userGameInfo: UserGameInfo = reactive({
-    user_id: ref(null),
-    server_id: ref(null),
-    game_id: ref(null),
-    game_uid: ref(null),
-    game_username: ref(null),
-    isMain: ref(null),
-    user_comment: ref(null),
-    
+  const userGameInfo = reactive<UserGameInfo>({
+    user_id: null,
+    server_id: null,
+    game_id: null,
+    game_uid: null,
+    game_username: null,
+    isMain: null,
+    user_comment: null,
   })
+  const validation_wordCount = (rule: any, value: string, callback: any, validationType: any) => {
+  if(validationType == "game_uid"){
+    if(value.length > 100){
+      callback(new Error('你的UID有够长,你是不是在搞事,最多150个字'))
+    } else {
+      callback()
+    }
+  } else if(validationType == "game_username"){
+    if(value.length > 100){
+      callback(new Error('我不知道你是不是在搞事,我只懂游戏都不会给你取那么长的名,最多100个字'))
+    } else {
+      callback()
+    }
+  } else if (validationType == "user_comment"){
+    if(value.length > 300){
+      callback(new Error('太长了拉,最多300个字,你以为你写作文?'))
+    } else {
+      callback()
+    }
+  } 
+  }
+  const testvalid = (rule: any, value: string, callback: any) => {
+    if(value.length > 10){
+      callback(new Error('你的UID有够长,你是不是在搞事,最多150个字'))
+    } else {
+      callback()
+    }
+  }
+  const validationRules = <FormRules<UserGameInfo>> ( {
+    isMain: [
+      { required: true, message: '請選擇賬號類型', trigger: 'blur' },
+    ],
+    server_id: [
+      { required: true, message: '請選擇服務器', trigger: 'blur' },
+    ],
+    game_uid: [
+      { required: true, message: '請輸入遊戲UID', trigger: 'blur' },
+      { validator:(rule, value, callback) => validation_wordCount(rule, value, callback, "game_uid"), trigger: 'blur' },
+    ],
+    game_username: [
+      { validator:(rule, value, callback) => validation_wordCount(rule, value, callback, "game_username"), trigger: 'blur' },
 
+    ],
+    user_comment: [
+      { validator:(rule, value, callback) => validation_wordCount(rule, value, callback, "user_comment"), trigger: 'blur' },
+
+    ],
+  })
   const serverInfo: ServerInfo = reactive({
     server_id: ref(null),
     game_id: ref(null),
@@ -152,7 +199,8 @@ export const useUidManipulateStore:UidManipulateStore = defineStore("uidManipula
   }
 
   return {
-    
+    validation_wordCount,
+    validationRules,
     userGameInfo,
     serverInfo,
     gameInfo,
