@@ -249,6 +249,8 @@ const starter = async () => {
   uidManipulate.serverInfo = await gameUidStorage.fetchSelectedGameServerInfo()
   userGameInfo.value = await gameUidStorage.fetchUserGameInfo()
   uidManipulate.userGameInfo = await gameUidStorage.fetchUserGameInfo()
+  uidManipulate.tempUserGameInfo = await gameUidStorage.fetchUserGameInfo()
+
   console.log(uidManipulate.serverInfo)
   console.log(userGameInfo.value)
   console.log(uidManipulate.userGameInfo)

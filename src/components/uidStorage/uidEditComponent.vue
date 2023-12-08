@@ -124,6 +124,7 @@ import { useUidManipulateStore } from "./../../stores/uidManipulate.ts"
 const uidManipulate = useUidManipulateStore()
 import { column } from 'element-plus/es/components/table-v2/src/common.mjs';
 import { ref , reactive} from 'vue'
+import { Console } from 'console';
 const userGameInfoRef = ref<FormInstance>()
 const editTableIndex = ref<number | null>(null)
 
@@ -196,6 +197,8 @@ const handleCancel = row => {
   editTableIndex.value = null
   userGameInfoRef.value.resetFields()
   console.log(row)
+      console.log(uidManipulate.compareUserGameInfo())
+
 }
 
 console.log(uidManipulate.serverInfo)
@@ -208,10 +211,18 @@ const handleSummit = async (row) => {
     if (valid) {
       console.log('valid',fields)
       console.log(userGameInfoRef.value)
+      console.log(`userGameInfoRef`,userGameInfoRef)
+      console.log(uidManipulate.userGameInfo)
+      console.log(uidManipulate.tempUserGameInfo)
       console.log(fields)
+      console.log(uidManipulate.compareUserGameInfo())
     } else {
+      console.log(uidManipulate.compareUserGameInfo())
+
       console.log('error submit!!',fields)
       console.log(userGameInfoRef)
+
+      console.log(uidManipulate.compareUserGameInfo())
 
     }
   })

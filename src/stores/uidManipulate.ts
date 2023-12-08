@@ -50,6 +50,16 @@ interface UidManipulateStore {
 }
 
 export const useUidManipulateStore:UidManipulateStore = defineStore("uidManipulate", () => {
+  const selectAccount_Index = ref("")
+  const gameUid = ref("")
+  const gameUsername = ref("")
+  const isMain = ref("")
+  const tempUid = ref("")
+  const tempUsername = ref("")
+  const tempIsMain = ref("")
+  const tempUserGameInfo = ref<UserGameInfo | null>(null)
+
+
   const userGameInfo = reactive<UserGameInfo>({
     user_id: null,
     server_id: null,
@@ -59,6 +69,22 @@ export const useUidManipulateStore:UidManipulateStore = defineStore("uidManipula
     isMain: null,
     user_comment: null,
   })
+   function compareUserGameInfo(userGameInfo , tempUserGameInfo){
+    console.log(this.userGameInfo[0])
+    console.log(this.tempUserGameInfo[0])
+    const Obj_key = Object.keys(this.userGameInfo)
+    const ObjTemp_key = Object.keys(this.tempUserGameInfo)
+    console.log(Obj_key.length)
+    if(Obj_key.length != ObjTemp_key.length){
+      console.log("length not equal")
+      return false
+    }
+    if(JSON.stringify(this.userGameInfo) != JSON.stringify(this.tempUserGameInfo)){
+      return false
+    }
+    return true
+  }
+
   const validation_wordCount = (rule: any, value: string, callback: any, validationType: any) => {
   if(validationType == "game_uid"){
     if(value?.length > 100){
@@ -80,13 +106,7 @@ export const useUidManipulateStore:UidManipulateStore = defineStore("uidManipula
     }
   } 
   }
-  const testvalid = (rule: any, value: string, callback: any) => {
-    if(value.length > 10){
-      callback(new Error('你的UID有够长,你是不是在搞事,最多150个字'))
-    } else {
-      callback()
-    }
-  }
+
   const validationRules = <FormRules<UserGameInfo>> ( {
     isMain: [
       { required: true, message: '請選擇賬號類型', trigger: 'blur' },
@@ -124,13 +144,6 @@ export const useUidManipulateStore:UidManipulateStore = defineStore("uidManipula
   })
 
 
-  const selectAccount_Index = ref("")
-  const gameUid = ref("")
-  const gameUsername = ref("")
-  const isMain = ref("")
-  const tempUid = ref("")
-  const tempUsername = ref("")
-  const tempIsMain = ref("")
   
 
 
@@ -199,6 +212,7 @@ export const useUidManipulateStore:UidManipulateStore = defineStore("uidManipula
   }
 
   return {
+    compareUserGameInfo,
     validation_wordCount,
     validationRules,
     userGameInfo,
