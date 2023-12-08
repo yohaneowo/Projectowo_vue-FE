@@ -209,7 +209,6 @@ const handleSummit = async (row) => {
       console.log('valid',fields)
       console.log(userGameInfoRef.value)
       console.log(fields)
-      formEl.resetFields()
     } else {
       console.log('error submit!!',fields)
       console.log(userGameInfoRef)

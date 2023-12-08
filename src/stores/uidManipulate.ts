@@ -61,19 +61,19 @@ export const useUidManipulateStore:UidManipulateStore = defineStore("uidManipula
   })
   const validation_wordCount = (rule: any, value: string, callback: any, validationType: any) => {
   if(validationType == "game_uid"){
-    if(value.length > 100){
+    if(value?.length > 100){
       callback(new Error('你的UID有够长,你是不是在搞事,最多150个字'))
     } else {
       callback()
     }
   } else if(validationType == "game_username"){
-    if(value.length > 100){
+    if(value?.length > 100){
       callback(new Error('我不知道你是不是在搞事,我只懂游戏都不会给你取那么长的名,最多100个字'))
     } else {
       callback()
     }
   } else if (validationType == "user_comment"){
-    if(value.length > 300){
+    if(value?.length > 300){
       callback(new Error('太长了拉,最多300个字,你以为你写作文?'))
     } else {
       callback()
